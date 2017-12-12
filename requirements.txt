@@ -52,4 +52,3 @@ virtualenv==15.1.0
 virtualenv-clone==0.2.6
 whitenoise==3.2
 wstool==0.1.13
-wxPython==4.0.0b2
