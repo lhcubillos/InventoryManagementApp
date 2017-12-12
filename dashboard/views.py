@@ -10,12 +10,13 @@ from .models import Medicamento
 
 
 class IndexView(TemplateView):
-    template_name = "components/index.html"
+    template_name = "components/panel.html"
 
     def get_context_data(self, **kwargs):
         context = super(IndexView, self).get_context_data(**kwargs)
-        context.update({'title': "Dashboard"})
+        context.update({'title': "Panel"})
         return context
+
 
 
 class BlankView(TemplateView):

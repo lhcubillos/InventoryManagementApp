@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 from datetime import datetime
 
@@ -15,6 +17,7 @@ class Medicamento(models.Model):
     formato_medicamento = models.CharField(max_length=50,default="-")
     tipo_medicamento = models.CharField(max_length=100,default="-")
     descripcion = models.TextField(default="-")
+    fecha_vencimiento = models.DateField()
 
     def __str__(self):
         return self.nombre_generico
@@ -67,5 +70,22 @@ class Medicamento_Ubicacion(models.Model):
     def __str__(self):
         return "med=" + str(self.medicamento)+", ubicacion=" + str(self.ubicacion)
 
+class Tipo_Usuario(models.Model):
+    tipo = models.CharField(max_length=50)
+    def __str__(self):
+        return self.tipo
 
+
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    tipo_usuario = models.ForeignKey(Tipo_Usuario)
+
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        Profile.objects.create(user=instance)
+
+@receiver(post_save, sender=User)
+def save_user_profile(sender, instance, **kwargs):
+    instance.profile.save()
 
