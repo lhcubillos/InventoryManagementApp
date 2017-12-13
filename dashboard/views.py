@@ -90,7 +90,7 @@ class LoginView(TemplateView):
             user = authenticate(username=username, password=password)
             if user != None:
                 login(request, user)
-                return HttpResponseRedirect('/index/')
+                return HttpResponseRedirect('/panel/')
             else:
                 # the authentication system was unable to verify the username and password
                 print("The username and password were incorrect.")
@@ -148,4 +148,36 @@ class TypographyView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(TypographyView, self).get_context_data(**kwargs)
         context.update({'title': "Typography"})
+        return context
+
+class OrdenIngresoView(TemplateView):
+    template_name = "components/orden_ingreso.html"
+
+    def get_context_data(self, **kwargs):
+        context = super(OrdenIngresoView, self).get_context_data(**kwargs)
+        context.update({'title': "Orden Ingreso"})
+        return context
+
+class OrdenEgresoView(TemplateView):
+    template_name = "components/orden_egreso.html"
+
+    def get_context_data(self, **kwargs):
+        context = super(OrdenEgresoView, self).get_context_data(**kwargs)
+        context.update({'title': "Orden Egreso"})
+        return context
+
+class EstadisticasView(TemplateView):
+    template_name = "components/estadisticas.html"
+
+    def get_context_data(self, **kwargs):
+        context = super(EstadisticasView, self).get_context_data(**kwargs)
+        context.update({'title': "Estadísticas"})
+        return context
+
+class ChequeoInventarioView(TemplateView):
+    template_name = "components/chequeo_inventario.html"
+
+    def get_context_data(self, **kwargs):
+        context = super(ChequeoInventarioView, self).get_context_data(**kwargs)
+        context.update({'title': "Chequeo Inventario"})
         return context

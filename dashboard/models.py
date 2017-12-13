@@ -17,18 +17,23 @@ class Medicamento(models.Model):
     formato_medicamento = models.CharField(max_length=50,default="-")
     tipo_medicamento = models.CharField(max_length=100,default="-")
     descripcion = models.TextField(default="-")
-    fecha_vencimiento = models.DateField()
 
     def __str__(self):
         return self.nombre_generico
 
-class Tipo_Ingreso(models.Model):
-    tipo = models.CharField(max_length=50)
-    def __str__(self):
-        return self.tipo
+# class Tipo_Ingreso(models.Model):
+#     tipo = models.CharField(max_length=50)
+#     def __str__(self):
+#         return self.tipo
+#
+# class Tipo_Egreso(models.Model):
+#     tipo = models.CharField(max_length=50)
+#     def __str__(self):
+#         return self.tipo
 
-class Tipo_Egreso(models.Model):
+class Tipo_Orden(models.Model):
     tipo = models.CharField(max_length=50)
+
     def __str__(self):
         return self.tipo
 
@@ -37,27 +42,41 @@ class Estacion(models.Model):
     def __str__(self):
         return self.estacion
 
-class Orden_Ingreso(models.Model):
-    medicamento = models.ForeignKey(Medicamento)
-    fecha_hora = models.DateTimeField(default=datetime.now)
-    cantidad = models.IntegerField()
-    tipo = models.ForeignKey(Tipo_Ingreso)
-    descripcion_tipo = models.CharField(max_length=150, blank=True,default="")
-    destino = models.ForeignKey(Estacion)
-    def __str__(self):
-        return str(self.fecha_hora)+": cant="+str(self.cantidad)+", med= "+str(self.medicamento) +\
-               ", tipo="+str(self.tipo)+", destino="+str(self.destino)
 
-class Orden_Salida(models.Model):
-    medicamento = models.ForeignKey(Medicamento)
+# class Orden_Ingreso(models.Model):
+#     medicamento = models.ForeignKey(Medicamento)
+#     fecha_hora = models.DateTimeField(default=datetime.now)
+#     cantidad = models.IntegerField()
+#     tipo = models.ForeignKey(Tipo_Ingreso)
+#     descripcion_tipo = models.CharField(max_length=150, blank=True, null=True,default="")
+#     destino = models.ForeignKey(Estacion)
+#     def __str__(self):
+#         return str(self.fecha_hora)+": cant="+str(self.cantidad)+", med= "+str(self.medicamento) +\
+#                ", tipo="+str(self.tipo)+", destino="+str(self.destino)
+#
+# class Orden_Salida(models.Model):
+#     medicamento = models.ForeignKey(Medicamento)
+#     fecha_hora = models.DateTimeField(default=datetime.now)
+#     cantidad = models.IntegerField()
+#     tipo = models.ForeignKey(Tipo_Egreso)
+#     descripcion_tipo = models.CharField(max_length=150, blank=True, null=True, default="")
+#     origen = models.ForeignKey(Estacion)
+#     def __str__(self):
+#         return str(self.fecha_hora)+": cant="+str(self.cantidad)+", med= "+str(self.medicamento) +\
+#                ", tipo="+str(self.tipo)+", origen="+str(self.origen)
+
+class Orden(models.Model):
     fecha_hora = models.DateTimeField(default=datetime.now)
-    cantidad = models.IntegerField()
-    tipo = models.ForeignKey(Tipo_Egreso)
-    descripcion_tipo = models.CharField(max_length=150, blank=True, default="")
-    origen = models.ForeignKey(Estacion)
+    salida = models.BooleanField()
+    tipo = models.ForeignKey(Tipo_Orden)
+    descripcion_tipo = models.CharField(max_length=150, blank=True, null=True)
+    origen = models.ForeignKey(Estacion, blank=True, null=True,related_name="origen")
+    destino = models.ForeignKey(Estacion, blank=True, null=True,related_name="destino")
+    user = models.ForeignKey(User)
+
     def __str__(self):
-        return str(self.fecha_hora)+": cant="+str(self.cantidad)+", med= "+str(self.medicamento) +\
-               ", tipo="+str(self.tipo)+", origen="+str(self.origen)
+        return str(self.fecha_hora)+":  tipo="+str(self.tipo)+", origen="+str(self.origen)+\
+               ", destino="+str(self.destino)+", user="+str(self.user)+", salida="+str(self.salida)
 
 class Ubicacion(models.Model):
     ubicacion = models.CharField(max_length=150)
@@ -89,3 +108,8 @@ def create_user_profile(sender, instance, created, **kwargs):
 def save_user_profile(sender, instance, **kwargs):
     instance.profile.save()
 
+class Orden_Medicamento(models.Model):
+    orden = models.ForeignKey(Orden)
+    medicamento = models.ForeignKey(Medicamento)
+    cantidad = models.IntegerField()
+    fecha_vencimiento = models.DateField()
