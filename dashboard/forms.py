@@ -17,6 +17,4 @@ class OrdenMedicamentoForm(forms.ModelForm):
 
     class Meta:
         model = Orden_Medicamento
-        widgets = {'fecha_vencimiento': DateTimePicker(options={
-        "format": "MM/YYYY","pickTime": False,'viewMode': 'years'})}
         fields = ['medicamento','cantidad','fecha_vencimiento']
