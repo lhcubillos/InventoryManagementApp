@@ -26,7 +26,11 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
     'dashboard',
+    'bootstrap3_datetime',
+    'bootstrapform',
+    'bootstrap_datepicker'
 )
 
 MIDDLEWARE_CLASSES = (

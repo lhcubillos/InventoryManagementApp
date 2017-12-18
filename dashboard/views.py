@@ -4,9 +4,10 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 
-from .forms import LoginForm
+from .forms import LoginForm,OrdenIngresoForm,OrdenMedicamentoForm
+from django.forms import formset_factory
 from django.shortcuts import render
-from .models import Medicamento
+from .models import Medicamento,Tipo_Orden,Estacion
 
 
 class IndexView(TemplateView):
@@ -152,19 +153,73 @@ class TypographyView(TemplateView):
 
 class OrdenIngresoView(TemplateView):
     template_name = "components/orden_ingreso.html"
-
+    formset_med = formset_factory(OrdenMedicamentoForm)
     def get_context_data(self, **kwargs):
+        form = OrdenIngresoForm(self.request.POST)
+
+        data = {
+        'form-TOTAL_FORMS': '1',
+        'form-INITIAL_FORMS': '0',
+        'form-MAX_NUM_FORMS': '5'}
+        med_formset = self.formset_med(data)
         context = super(OrdenIngresoView, self).get_context_data(**kwargs)
-        context.update({'title': "Orden Ingreso"})
+        tipos_orden = Tipo_Orden.objects.all()
+        estaciones = Estacion.objects.all()
+        context.update({'title': "Orden Ingreso","formset":med_formset,"form_2":form,
+                        "fallido":False,"tipos":tipos_orden,"estaciones":estaciones})
         return context
+
+    def post(self, request, *args, **kwargs):
+        form = LoginForm(self.request.POST)
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+            user = authenticate(username=username, password=password)
+            if user != None:
+                login(request, user)
+                return HttpResponseRedirect('/panel/')
+            else:
+                # the authentication system was unable to verify the username and password
+                print("The username and password were incorrect.")
+        else:
+            form = LoginForm()
+        return render(request, 'components/login.html', {'title': "Log In",'form': form,"fallido":True})
 
 class OrdenEgresoView(TemplateView):
     template_name = "components/orden_egreso.html"
 
+    formset_med = formset_factory(OrdenMedicamentoForm)
+
     def get_context_data(self, **kwargs):
+        form = OrdenIngresoForm(self.request.POST)
+
+        data = {
+            'form-TOTAL_FORMS': '1',
+            'form-INITIAL_FORMS': '0',
+            'form-MAX_NUM_FORMS': ''}
+        med_formset = self.formset_med(data)
         context = super(OrdenEgresoView, self).get_context_data(**kwargs)
-        context.update({'title': "Orden Egreso"})
+        tipos_orden = Tipo_Orden.objects.all()
+        estaciones = Estacion.objects.all()
+        context.update({'title': "Orden Egreso", "formset": med_formset, "form_2": form,
+                        "fallido": False, "tipos": tipos_orden, "estaciones": estaciones})
         return context
+
+    def post(self, request, *args, **kwargs):
+        form = LoginForm(self.request.POST)
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+            user = authenticate(username=username, password=password)
+            if user != None:
+                login(request, user)
+                return HttpResponseRedirect('/panel/')
+            else:
+                # the authentication system was unable to verify the username and password
+                print("The username and password were incorrect.")
+        else:
+            form = LoginForm()
+        return render(request, 'components/login.html', {'title': "Log In", 'form': form, "fallido": True})
 
 class EstadisticasView(TemplateView):
     template_name = "components/estadisticas.html"
