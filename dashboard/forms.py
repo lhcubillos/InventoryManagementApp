@@ -1,6 +1,5 @@
 from django import forms
 from .models import Orden,Orden_Medicamento
-from bootstrap3_datetime.widgets import DateTimePicker
 
 class LoginForm(forms.Form):
     username = forms.CharField(label='User Name', max_length=64)
