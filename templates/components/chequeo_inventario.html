@@ -1,6 +1,21 @@
 {% extends "dashboard/base.html" %}
 
 {% block extrahead %}
+<script>
+    $(document).on("click", ".chequeo-inventario", function () {
+         var nom_gen = $(this).children('td#gen').text();
+         var nom_com = $(this).children('td#com').text();
+         var fecha_venc = $(this).children('td#fecha').text();
+         var bodega = $(this).children('td#bod').text();
+         var botiquin = $(this).children('td#bot').text();
+
+         $(".modal-body #nombre_generico").val( nom_gen );
+         $(".modal-body #nombre_comercial").val( nom_com );
+         $(".modal-body #fecha_vencimiento").val( fecha_venc );
+         $(".modal-body #bodega_actual").val( bodega );
+         $(".modal-body #botiquin_actual").val( botiquin );
+    });
+</script>
 
 {% endblock extrahead %}
 
@@ -38,25 +53,102 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr class="item">
-                                <td>hola</td>
-                                <td>como</td>
-                                <td>va</td>
-                                <td>va</td>
-                                <td>va</td>
-                            </tr>
-                            <tr class="item">
-                                <td>cuando</td>
-                                <td>te</td>
-                                <td>vas</td>
-                                <td>va</td>
-                                <td>va</td>
-                            </tr>
+                            {% for med in conteo %}
+                                <tr class="item chequeo-inventario" data-toggle="modal" data-id="{{ forloop.counter0 }}" data-target="#modalChequeo">
+                                    <td id="gen">{{ med.generico }}</td>
+                                    <td id="com">{{ med.comercial }}</td>
+                                    <td id="fecha">{{ med.fecha_venc }}</td>
+                                    <td id="bod">{{ med.cantidad_bodega }}</td>
+                                    <td id="bot">{{ med.cantidad_botiquin }}</td>
+                                </tr>
+                            {% endfor %}
                         </tbody>
                     </table>
                 </div>
-                <br>
+                <!-- Modal -->
+                <div id="modalChequeo" class="modal fade" role="dialog">
+                  <div class="modal-dialog">
 
+                    <!-- Modal content-->
+                    <div class="modal-content">
+                      <!-- Modal Header -->
+                        <div class="modal-header">
+                            <button type="button" class="close"
+                               data-dismiss="modal">
+                                   <span aria-hidden="true">&times;</span>
+                                   <span class="sr-only">Cerrar</span>
+                            </button>
+                            <h4 class="modal-title" id="myModalLabel">
+                                Chequeo de Inventario
+                            </h4>
+                        </div>
+
+                        <!-- Modal Body -->
+                        <div class="modal-body">
+
+                            <form role="form">
+                              <div class="form-group row">
+                                <label for="nombre_generico" class="col-sm-2 col-form-label">Nombre Genérico</label>
+                                <div class="col-sm-10">
+                                  <input type="text" readonly class="form-control-plaintext" id="nombre_generico" value="">
+                                </div>
+                              </div>
+                              <div class="form-group row">
+                                <label for="nombre_comercial" class="col-sm-2 col-form-label">Nombre Comercial</label>
+                                <div class="col-sm-10">
+                                  <input type="text" readonly class="form-control-plaintext" id="nombre_comercial" value="">
+                                </div>
+                              </div>
+                              <div class="form-group row">
+                                <label for="fecha_vencimiento" class="col-sm-2 col-form-label">Fecha de Vencimiento</label>
+                                <div class="col-sm-10">
+                                  <input type="text" readonly class="form-control-plaintext" id="fecha_vencimiento" value="">
+                                </div>
+                              </div>
+                              <div class="form-group row">
+                                <label for="bodega_actual" class="col-sm-2 col-form-label">Conteo actual en Bodega</label>
+                                <div class="col-sm-10">
+                                  <input type="text" readonly class="form-control-plaintext" id="bodega_actual" value="">
+                                </div>
+                              </div>
+                              <div class="form-group row">
+                                <label for="bodega_real" class="col-sm-2 col-form-label">Conteo real Bodega</label>
+                                <div class="col-sm-10">
+                                    <input type="number" id="bodega_real">
+                                </div>
+                              </div>
+                              <div class="form-group row">
+                                <label for="botiquin_actual" class="col-sm-2 col-form-label">Conteo actual en Botiquín</label>
+                                <div class="col-sm-10">
+                                  <input type="text" readonly class="form-control-plaintext" id="botiquin_actual" value="">
+                                </div>
+                              </div>
+                              <div class="form-group row">
+                                <label for="botiquin_real" class="col-sm-2 col-form-label">Conteo real Botiquin</label>
+                                <div class="col-sm-10">
+                                  <input type="number" id="botiquin_real">
+                                </div>
+                              </div>
+
+
+                              <button type="submit" class="btn btn-default">Ingresar</button>
+                            </form>
+
+
+                        </div>
+
+                        <!-- Modal Footer -->
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default"
+                                    data-dismiss="modal">
+                                        Cerrar
+                            </button>
+                        </div>
+                    </div>
+                    </div>
+
+                  </div>
+                </div>
             </div>
             <!-- /.panel-body -->
         </div>

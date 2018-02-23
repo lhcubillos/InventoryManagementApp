@@ -12,14 +12,14 @@ class Medicamento(models.Model):
     nombre_comercial = models.CharField(max_length=150,default="-")
     nombre_generico = models.CharField(max_length=150,default="-")
     cantidad_frasco = models.CharField(max_length=50,default="N/A")
-    dosis = models.IntegerField(default=0)
-    unidad_dosis = models.CharField(max_length=10,default="-")
+    dosis = models.CharField(max_length=20,default="-")
     formato_medicamento = models.CharField(max_length=50,default="-")
     tipo_medicamento = models.CharField(max_length=100,default="-")
     descripcion = models.TextField(default="-")
 
     def __str__(self):
-        return self.nombre_generico
+        return self.nombre_generico+" | "+self.nombre_comercial+" | "+self.formato_medicamento+" | "+\
+               self.cantidad_frasco+" | "+self.dosis
 
 # class Tipo_Ingreso(models.Model):
 #     tipo = models.CharField(max_length=50)
