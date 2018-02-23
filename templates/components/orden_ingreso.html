@@ -69,7 +69,7 @@
                           {% for form in formset %}
                             <li class="list-group-item formset"  >
                                 <div class="col-md-6 mb-3">
-                                  <label for="med">Medicamento</label>
+                                  <label for="med">Medicamento (nombre genérico | comercial)</label>
                                   <select class="form-control" id="med">
                                     {% for medicamento in medicamentos %}
                                     <option>{{ medicamento }}</option>
@@ -88,7 +88,7 @@
 
                                 </div>
                                 <div class="col-md-3 mb-3">
-                                  <label for="validationServer05">Cantidad</label>
+                                  <label for="validationServer05">Cantidad (según formato)</label>
                                   <input type="number" class="form-control" id="validationServer05">
                                 </div>
                             </li>

@@ -18,7 +18,7 @@ class Medicamento(models.Model):
     descripcion = models.TextField(default="-")
 
     def __str__(self):
-        return self.nombre_generico+" | "+self.nombre_comercial+" | "+self.formato_medicamento+" | "+\
+        return self.nombre_generico+" | "+self.nombre_comercial+" | Formato: "+self.formato_medicamento+" | "+\
                self.cantidad_frasco+" | "+self.dosis
 
 # class Tipo_Ingreso(models.Model):
