@@ -197,18 +197,13 @@ class OrdenIngresoView(TemplateView):
     template_name = "components/orden_ingreso.html"
 
     def get_context_data(self, **kwargs):
-        form = OrdenIngresoForm(self.request.POST)
-        formset_med = formset_factory(OrdenMedicamentoForm)
-        data = {
-        'form-TOTAL_FORMS': '1',
-        'form-INITIAL_FORMS': '0',
-        'form-MAX_NUM_FORMS': '5'}
-        #med_formset = self.formset_med(data)
+        #form = OrdenIngresoForm(self.request.POST)
+        OrdenFormset = inlineformset_factory(Orden, Orden_Medicamento, form=OrdenMedicamentoForm,extra=1)
         context = super(OrdenIngresoView, self).get_context_data(**kwargs)
         tipos_orden = Tipo_Orden.objects.all()
         estaciones = Estacion.objects.all()
         medicamentos = Medicamento.objects.all()
-        context.update({'title': "Orden Ingreso","formset":formset_med,"form_2":form,
+        context.update({'title': "Orden Ingreso","formset":OrdenFormset(),
                         "fallido":False,"tipos":tipos_orden,"estaciones":estaciones,
                         "medicamentos":medicamentos})
         return context
