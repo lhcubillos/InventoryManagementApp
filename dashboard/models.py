@@ -5,6 +5,10 @@ from django.dispatch import receiver
 
 from datetime import datetime
 
+import pytz
+
+
+
 
 # Create your models here.
 class Medicamento(models.Model):
@@ -70,13 +74,20 @@ class Orden(models.Model):
     salida = models.BooleanField()
     tipo = models.ForeignKey(Tipo_Orden)
     descripcion_tipo = models.CharField(max_length=150, blank=True, null=True)
-    origen = models.ForeignKey(Estacion, blank=True, null=True,related_name="origen")
-    destino = models.ForeignKey(Estacion, blank=True, null=True,related_name="destino")
+    origen = models.ForeignKey(Estacion,related_name="origen")
+    destino = models.ForeignKey(Estacion, related_name="destino")
     user = models.ForeignKey(User)
+
 
     def __str__(self):
         return str(self.fecha_hora)+":  tipo="+str(self.tipo)+", origen="+str(self.origen)+\
                ", destino="+str(self.destino)+", user="+str(self.user)+", salida="+str(self.salida)
+
+    @classmethod
+    def create(cls, tipo,origen,destino,user):
+        orden = cls(tipo=tipo,origen=origen,destino=destino,user=user)
+        # do something with the book
+        return orden
 
 class Ubicacion(models.Model):
     ubicacion = models.CharField(max_length=150)

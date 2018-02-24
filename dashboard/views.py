@@ -139,7 +139,7 @@ class LoginView(TemplateView):
                 print("The username and password were incorrect.")
         else:
             form = LoginForm()
-        return render(request, 'components/login.html', {'title': "Log In",'form': form,"fallido":True})
+        return render(request, 'components/login.html', {'title': "Ingresar",'form': form,"fallido":True})
 
 class LogoutView(RedirectView):
     pattern_name = 'login'
@@ -195,34 +195,38 @@ class TypographyView(TemplateView):
 
 class OrdenIngresoView(TemplateView):
     template_name = "components/orden_ingreso.html"
-
+    OrdenFormset = formset_factory(OrdenMedicamentoForm, extra=1)
     def get_context_data(self, **kwargs):
-        #form = OrdenIngresoForm(self.request.POST)
-        OrdenFormset = inlineformset_factory(Orden, Orden_Medicamento, form=OrdenMedicamentoForm,extra=1)
+        form = OrdenIngresoForm(self.request.POST)
+        #OrdenFormset = inlineformset_factory(Orden, Orden_Medicamento, form=OrdenMedicamentoForm,extra=1)
+
         context = super(OrdenIngresoView, self).get_context_data(**kwargs)
-        tipos_orden = Tipo_Orden.objects.all()
-        estaciones = Estacion.objects.all()
-        medicamentos = Medicamento.objects.all()
-        context.update({'title': "Orden Ingreso","formset":OrdenFormset(),
-                        "fallido":False,"tipos":tipos_orden,"estaciones":estaciones,
-                        "medicamentos":medicamentos})
+        formset = self.OrdenFormset()
+        context.update({'title': "Orden Ingreso","form2":form,"formset":formset})
         return context
 
     def post(self, request, *args, **kwargs):
-        form = LoginForm(self.request.POST)
-        if form.is_valid():
-            username = form.cleaned_data['username']
-            password = form.cleaned_data['password']
-            user = authenticate(username=username, password=password)
-            if user != None:
-                login(request, user)
-                return HttpResponseRedirect('/panel/')
-            else:
-                # the authentication system was unable to verify the username and password
-                print("The username and password were incorrect.")
+        form = OrdenIngresoForm(self.request.POST)
+        formset = self.OrdenFormset(self.request.POST)
+        if all([form.is_valid(),formset.is_valid()]):
+            nueva_orden = form.save(commit=False)
+            nueva_orden.user = self.request.user
+            nueva_orden.salida = False
+            nueva_orden.save()
+
+            for med_form in formset:
+                nueva_med_orden = med_form.save(commit=False)
+                nueva_med_orden.orden = nueva_orden
+                nueva_med_orden.save()
+
+            return HttpResponseRedirect('/panel/')
+
         else:
-            form = LoginForm()
-        return render(request, 'components/login.html', {'title': "Log In",'form': form,"fallido":True})
+            print("no valido")
+            print(formset.errors)
+            form = OrdenIngresoForm()
+
+        return render(request, 'components/OrdenIngreso.html', {})
 
 class OrdenEgresoView(TemplateView):
     template_name = "components/orden_egreso.html"
