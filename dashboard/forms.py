@@ -24,3 +24,7 @@ class OrdenMedicamentoForm(forms.ModelForm):
 
     fecha_vencimiento = forms.DateField(input_formats=["%d/%m/%Y"],
         widget=forms.widgets.DateInput(format="%m/%Y",attrs={"class": "form-control"}))
+
+class ChequeoInventarioForm(forms.Form):
+    conteo_real_bodega = forms.IntegerField(widget=forms.widgets.NumberInput(attrs={"class": "form-control"}))
+    conteo_real_botiquin = forms.IntegerField(widget=forms.widgets.NumberInput(attrs={"class": "form-control"}))

@@ -4,7 +4,7 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 
-from .forms import LoginForm,OrdenIngresoForm,OrdenMedicamentoForm
+from .forms import LoginForm,OrdenIngresoForm,OrdenMedicamentoForm,ChequeoInventarioForm
 from django.forms import formset_factory, inlineformset_factory
 from django.shortcuts import render
 from .models import Medicamento,Tipo_Orden,Estacion,Orden,Orden_Medicamento
@@ -57,7 +57,7 @@ class IndexView(TemplateView):
         conteo_med = [x for x in conteo_med1 if x["fecha_venc"] < datetime.date(datetime.now())]
         por_fecha = sorted(conteo_med, key=lambda med: med["fecha_venc"])
         context = super(IndexView, self).get_context_data(**kwargs)
-        context.update({'title': "Panel","conteo":por_fecha,"total":conteo_med})
+        context.update({'title': "Panel","conteo":por_fecha,"total":conteo_med1})
         return context
 
 
@@ -226,45 +226,44 @@ class OrdenIngresoView(TemplateView):
             print(formset.errors)
             form = OrdenIngresoForm()
 
-        return render(request, 'components/OrdenIngreso.html', {})
+        return HttpResponseRedirect('/orden_ingreso/')
 
 class OrdenEgresoView(TemplateView):
     template_name = "components/orden_egreso.html"
 
-    formset_med = formset_factory(OrdenMedicamentoForm)
+    OrdenFormset = formset_factory(OrdenMedicamentoForm, extra=1)
 
     def get_context_data(self, **kwargs):
         form = OrdenIngresoForm(self.request.POST)
+        # OrdenFormset = inlineformset_factory(Orden, Orden_Medicamento, form=OrdenMedicamentoForm,extra=1)
 
-        data = {
-            'form-TOTAL_FORMS': '1',
-            'form-INITIAL_FORMS': '0',
-            'form-MAX_NUM_FORMS': ''}
-        med_formset = self.formset_med(data)
         context = super(OrdenEgresoView, self).get_context_data(**kwargs)
-        tipos_orden = Tipo_Orden.objects.all()
-        estaciones = Estacion.objects.all()
-        medicamentos = Medicamento.objects.all()
-        context.update({'title': "Orden Egreso", "formset": med_formset, "form_2": form,
-                        "fallido": False, "tipos": tipos_orden, "estaciones": estaciones,
-                        "medicamentos":medicamentos})
+        formset = self.OrdenFormset()
+        context.update({'title': "Orden Egreso", "form2": form, "formset": formset})
         return context
 
     def post(self, request, *args, **kwargs):
-        form = LoginForm(self.request.POST)
-        if form.is_valid():
-            username = form.cleaned_data['username']
-            password = form.cleaned_data['password']
-            user = authenticate(username=username, password=password)
-            if user != None:
-                login(request, user)
-                return HttpResponseRedirect('/panel/')
-            else:
-                # the authentication system was unable to verify the username and password
-                print("The username and password were incorrect.")
+        form = OrdenIngresoForm(self.request.POST)
+        formset = self.OrdenFormset(self.request.POST)
+        if all([form.is_valid(), formset.is_valid()]):
+            nueva_orden = form.save(commit=False)
+            nueva_orden.user = self.request.user
+            nueva_orden.salida = True
+            nueva_orden.save()
+
+            for med_form in formset:
+                nueva_med_orden = med_form.save(commit=False)
+                nueva_med_orden.orden = nueva_orden
+                nueva_med_orden.save()
+
+            return HttpResponseRedirect('/panel/')
+
         else:
-            form = LoginForm()
-        return render(request, 'components/login.html', {'title': "Log In", 'form': form, "fallido": True})
+            print("no valido")
+            print(formset.errors)
+            form = OrdenIngresoForm()
+
+        return HttpResponseRedirect('/orden_egreso/')
 
 class EstadisticasView(TemplateView):
     template_name = "components/estadisticas.html"
@@ -278,8 +277,9 @@ class ChequeoInventarioView(TemplateView):
     template_name = "components/chequeo_inventario.html"
 
     def get_context_data(self, **kwargs):
+        form = ChequeoInventarioForm()
         conteo_final = conteo_medicamentos()
         context = super(ChequeoInventarioView, self).get_context_data(**kwargs)
-        context.update({'title': "Chequeo Inventario","conteo":conteo_final})
+        context.update({'title': "Chequeo Inventario","conteo":conteo_final,"form":form})
         return context
 

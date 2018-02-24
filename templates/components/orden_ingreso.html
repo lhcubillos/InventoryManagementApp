@@ -106,13 +106,6 @@
         added: renewDatePickers
     });
 
-    $('#formset').on('formAdded', function(event) {
-        newForm = event.target;
-        $('.datetimepicker1').datetimepicker({
-                viewMode: 'years',
-                format: 'MM/YYYY'
-        });
-    });
     function renewDatePickers() {
         $('.datetimepicker1').each(function(){
             $(this).datetimepicker({

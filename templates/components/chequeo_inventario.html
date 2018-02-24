@@ -9,11 +9,24 @@
          var bodega = $(this).children('td#bod').text();
          var botiquin = $(this).children('td#bot').text();
 
-         $(".modal-body #nombre_generico").val( nom_gen );
-         $(".modal-body #nombre_comercial").val( nom_com );
-         $(".modal-body #fecha_vencimiento").val( fecha_venc );
-         $(".modal-body #bodega_actual").val( bodega );
-         $(".modal-body #botiquin_actual").val( botiquin );
+         $(".modal-body #nombre_generico").text( nom_gen );
+         $(".modal-body #nombre_comercial").text( nom_com );
+         $(".modal-body #fecha_vencimiento").text( fecha_venc );
+         $(".modal-body #bodega_actual").text( bodega );
+         $(".modal-body #botiquin_actual").text( botiquin );
+    });
+</script>
+
+<script>
+    $(document).ready(function(){
+        $("#btn_bodega").click(function(){
+            $("#act_bodega").show();
+            $("#act_botiquin").hide();
+        });
+        $("#btn_botiquin").click(function(){
+            $("#act_bodega").hide();
+            $("#act_botiquin").show();
+        });
     });
 </script>
 
@@ -76,7 +89,6 @@
                             <button type="button" class="close"
                                data-dismiss="modal">
                                    <span aria-hidden="true">&times;</span>
-                                   <span class="sr-only">Cerrar</span>
                             </button>
                             <h4 class="modal-title" id="myModalLabel">
                                 Chequeo de Inventario
@@ -86,64 +98,74 @@
                         <!-- Modal Body -->
                         <div class="modal-body">
 
-                            <form role="form">
-                              <div class="form-group row">
-                                <label for="nombre_generico" class="col-sm-2 col-form-label">Nombre Genérico</label>
-                                <div class="col-sm-10">
-                                  <input type="text" readonly class="form-control-plaintext" id="nombre_generico" value="">
-                                </div>
+                            <div class="panel panel-default">
+                              <div class="panel-heading">Medicamento Actual</div>
+                              <div class="panel-body" >
+                                  <p >
+                                      <b>Nombre Genérico: </b><span id="nombre_generico"></span>
+                                  </p>
+                                  <p >
+                                      <b>Nombre Comercial: </b><span id="nombre_comercial"></span>
+                                  </p>
+                                  <p >
+                                      <b>Fecha Vencimiento: </b><span id="fecha_vencimiento"></span>
+                                  </p>
+                                  <p >
+                                      <b>Cantidad actual en bodega: </b><span id="bodega_actual"></span>
+                                  </p>
+                                  <p >
+                                      <b>Cantidad actual en botiquín: </b><span id="botiquin_actual"></span>
+                                  </p>
                               </div>
-                              <div class="form-group row">
-                                <label for="nombre_comercial" class="col-sm-2 col-form-label">Nombre Comercial</label>
-                                <div class="col-sm-10">
-                                  <input type="text" readonly class="form-control-plaintext" id="nombre_comercial" value="">
-                                </div>
-                              </div>
-                              <div class="form-group row">
-                                <label for="fecha_vencimiento" class="col-sm-2 col-form-label">Fecha de Vencimiento</label>
-                                <div class="col-sm-10">
-                                  <input type="text" readonly class="form-control-plaintext" id="fecha_vencimiento" value="">
-                                </div>
-                              </div>
-                              <div class="form-group row">
-                                <label for="bodega_actual" class="col-sm-2 col-form-label">Conteo actual en Bodega</label>
-                                <div class="col-sm-10">
-                                  <input type="text" readonly class="form-control-plaintext" id="bodega_actual" value="">
-                                </div>
-                              </div>
-                              <div class="form-group row">
-                                <label for="bodega_real" class="col-sm-2 col-form-label">Conteo real Bodega</label>
-                                <div class="col-sm-10">
-                                    <input type="number" id="bodega_real">
-                                </div>
-                              </div>
-                              <div class="form-group row">
-                                <label for="botiquin_actual" class="col-sm-2 col-form-label">Conteo actual en Botiquín</label>
-                                <div class="col-sm-10">
-                                  <input type="text" readonly class="form-control-plaintext" id="botiquin_actual" value="">
-                                </div>
-                              </div>
-                              <div class="form-group row">
-                                <label for="botiquin_real" class="col-sm-2 col-form-label">Conteo real Botiquin</label>
-                                <div class="col-sm-10">
-                                  <input type="number" id="botiquin_real">
-                                </div>
+                            </div>
+
+                            <div class="btn-group btn-group-justified">
+                              <a href="#" class="btn btn-primary" id="btn_bodega">Actualización Bodega</a>
+                              <a href="#" class="btn btn-primary" id="btn_botiquin">Actualización Botiquín</a>
+                            </div>
+
+                            <br>
+
+
+                            <form role="form" method="POST" id="act_bodega">
+
+                              <div class="form-group">
+                                <label>Conteo real en bodega:</label>
+                                  {{ form.conteo_real_bodega }}
+
+
                               </div>
 
 
-                              <button type="submit" class="btn btn-default">Ingresar</button>
+                              <button type="submit" class="btn btn-default btn-block">Actualizar Bodega</button>
+                            </form>
+
+                            <form role="form" method="POST" id="act_botiquin" style="display: none;">
+
+
+                              <div class="form-group">
+                                <label>Conteo real en botiquín:</label>
+                                  {{ form.conteo_real_botiquin }}
+                                </div>
+
+
+
+
+                              <button type="submit" class="btn btn-default btn-block">Actualizar Botiquín</button>
                             </form>
 
 
+
+
                         </div>
 
-                        <!-- Modal Footer -->
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-default"
-                                    data-dismiss="modal">
-                                        Cerrar
-                            </button>
-                        </div>
+                        <!--&lt;!&ndash; Modal Footer &ndash;&gt;-->
+                        <!--<div class="modal-footer">-->
+                            <!--<button type="button" class="btn btn-default"-->
+                                    <!--data-dismiss="modal">-->
+                                        <!--Cerrar-->
+                            <!--</button>-->
+                        <!--</div>-->
                     </div>
                     </div>
 

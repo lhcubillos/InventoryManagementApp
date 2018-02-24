@@ -1,17 +1,18 @@
 {% extends "dashboard/base.html" %}
 {% load staticfiles %}
-{% load bootstrap %}
 
 {% block extrahead %}
 <!-- Include formset plugin - including jQuery dependency -->
 <script src="{% static 'js/bootstrap-datetimepicker.js' %}"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.css">
 
+
+
 <script type="text/javascript">
     $(function () {
         $('.datetimepicker1').datetimepicker({
-            viewMode: 'years',
-            format: 'MM/YYYY'
+                viewMode: 'years',
+                format: 'DD/MM/YYYY'
         });
     });
 </script>
@@ -30,52 +31,41 @@
     <div class="col-lg-20">
         <div class="panel panel-default">
             <div class="panel-heading">
-                Nueva Orden de Ingreso
+                Nueva Orden de Egreso
             </div>
             <div class="panel-body">
-                    <form>
+                    <form method="POST">
+                      {% csrf_token %}
                       <div class="row">
                         <div class="col-md-3 mb-3">
-                          <label for="validationServer01">Tipo de Orden</label>
-                          <select class="form-control" id="validationServer01">
-                                {% for tipo in tipos %}
-                                <option>{{ tipo.tipo }}</option>
-                                {% endfor %}
-                            </select>
+                          <label>Tipo de Orden</label>
+                          {{ form2.tipo }}
                         </div>
                         <div class="col-md-3 mb-3">
-                          <label for="validationServer02">Origen</label>
-                          <select class="form-control" id="validationServer02">
-                                {% for estacion in estaciones %}
-                                <option>{{ estacion.estacion }}</option>
-                                {% endfor %}
-                            </select>
+                          <label>Origen</label>
+                          {{ form2.origen }}
                         </div>
                         <div class="col-md-3 mb-3">
-                          <label for="validationServer03">Destino</label>
-                          <select class="form-control" id="validationServer03">
-                                {% for estacion in estaciones %}
-                                <option>{{ estacion.estacion }}</option>
-                                {% endfor %}
-                            </select>
+                          <label>Destino</label>
+                          {{ form2.destino }}
                         </div>
                       </div>
+
                       <br>
+                        <h4>Medicamentos en orden</h4>
+                        {{ formset.management_form }}
                         <ul class="list-group borderless">
-                          {% for form in formset %}
+                          {% for form in formset.forms %}
                             <li class="list-group-item formset"  >
                                 <div class="col-md-6 mb-3">
-                                  <label for="med">Medicamento</label>
-                                  <select class="form-control" id="med">
-                                    {% for medicamento in medicamentos %}
-                                    <option>{{ medicamento }}</option>
-                                    {% endfor %}
-                                  </select>
+                                  <label>Medicamento (nombre genérico | comercial)</label>
+                                  {{ form.medicamento }}
                                 </div>
                                 <div class="col-md-3 mb-3">
-                                  <label for="{{ forloop.counter }}">Fecha Vencimiento</label>
-                                  <div class='input-group date datetimepicker1' id='{{ forloop.counter }}'>
-                                        <input type='text' class="form-control" />
+                                  <label>Fecha Vencimiento</label>
+
+                                  <div class='input-group date datetimepicker1'>
+                                        {{ form.fecha_vencimiento }}
                                         <span class="input-group-addon">
                                             <span class="glyphicon glyphicon-calendar">
                                             </span>
@@ -84,15 +74,14 @@
 
                                 </div>
                                 <div class="col-md-3 mb-3">
-                                  <label for="validationServer05">Cantidad</label>
-                                  <input type="number" class="form-control" id="validationServer05">
+                                  <label>Cantidad (según formato)</label>
+                                    {{ form.cantidad }}
                                 </div>
                             </li>
                           {% endfor %}
                         </ul>
 
-
-                      <button class="btn btn-primary" type="submit">Submit form</button>
+                      <input class="btn btn-primary" type="submit" value="Submit" />
                     </form>
 
                 </div>
@@ -117,7 +106,14 @@
         added: renewDatePickers
     });
 
-    function renewDatePickers() {}
+    function renewDatePickers() {
+        $('.datetimepicker1').each(function(){
+            $(this).datetimepicker({
+                viewMode: 'years',
+                format: 'DD/MM/YYYY'
+            });
+           });
+    }
 
 
 </script>
