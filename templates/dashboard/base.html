@@ -119,32 +119,40 @@
                         <a href="{% url 'dashboard:panel' %}">
                             <i class="fa fa-dashboard fa-fw"></i> Panel Principal</a>
                     </li>
-                    <li>
-                        <a href="#"><i class="fa fa-file-text fa-fw"></i> Órdenes<span class="fa arrow"></span></a>
-                        <ul class="nav nav-second-level">
+                    {% for group in user.groups.all %}
+                        {% if group.name == 'Administrador' or group.name == 'Operario'%}
                             <li>
-                                <a href="{% url 'dashboard:orden_ingreso' %}">
-                                    <i class="fa fa-sign-in fa-fw"></i> Ingreso</a>
+                                <a href="#"><i class="fa fa-file-text fa-fw"></i> Órdenes<span class="fa arrow"></span></a>
+                                <ul class="nav nav-second-level">
+                                    <li>
+                                        <a href="{% url 'dashboard:orden_ingreso' %}">
+                                            <i class="fa fa-sign-in fa-fw"></i> Ingreso</a>
+                                    </li>
+                                    <li>
+                                        <a href="{% url 'dashboard:orden_traspaso' %}">
+                                            <i class="fa fa-arrow-circle-o-right"></i> Traspaso</a>
+                                    </li>
+                                    <li>
+                                        <a href="{% url 'dashboard:orden_egreso' %}">
+                                            <i class="fa fa-sign-out fa-fw"></i> Egreso</a>
+                                    </li>
+                                </ul>
+                                <!-- /.nav-second-level -->
                             </li>
+
+
                             <li>
-                                <a href="{% url 'dashboard:orden_traspaso' %}">
-                                    <i class="fa fa-arrow-circle-o-right"></i> Traspaso</a>
+                                <a href="{% url 'dashboard:chequeo_inventario' %}">
+                                    <i class="fa fa-check fa-fw"></i> Chequeo Inventario</a>
                             </li>
+                        {% endif %}
+                        {% if group.name == 'Administrador' %}
                             <li>
-                                <a href="{% url 'dashboard:orden_egreso' %}">
-                                    <i class="fa fa-sign-out fa-fw"></i> Egreso</a>
+                                <a href="{% url 'dashboard:estadisticas' %}">
+                                    <i class="fa fa-bar-chart-o fa-fw"></i> Estadísticas</a>
                             </li>
-                        </ul>
-                        <!-- /.nav-second-level -->
-                    </li>
-                    <li>
-                        <a href="{% url 'dashboard:chequeo_inventario' %}">
-                            <i class="fa fa-check fa-fw"></i> Chequeo Inventario</a>
-                    </li>
-                    <li>
-                        <a href="{% url 'dashboard:estadisticas' %}">
-                            <i class="fa fa-bar-chart-o fa-fw"></i> Estadísticas</a>
-                    </li>
+                        {% endif %}
+                    {% endfor %}
 
                 </ul>
             </div>

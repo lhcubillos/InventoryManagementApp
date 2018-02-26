@@ -37,7 +37,7 @@ class Medicamento(models.Model):
 
 class Tipo_Orden(models.Model):
     tipo = models.CharField(max_length=50)
-
+    clase = models.IntegerField()  # 0 ingreso, 1 traspaso, 2 egreso, 3 interno
     def __str__(self):
         return self.tipo
 
@@ -106,18 +106,6 @@ class Tipo_Usuario(models.Model):
         return self.tipo
 
 
-class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    tipo_usuario = models.ForeignKey(Tipo_Usuario)
-
-@receiver(post_save, sender=User)
-def create_user_profile(sender, instance, created, **kwargs):
-    if created:
-        Profile.objects.create(user=instance)
-
-@receiver(post_save, sender=User)
-def save_user_profile(sender, instance, **kwargs):
-    instance.profile.save()
 
 class Orden_Medicamento(models.Model):
     orden = models.ForeignKey(Orden)

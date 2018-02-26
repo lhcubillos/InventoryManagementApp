@@ -4,7 +4,8 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 
-from .forms import LoginForm,OrdenIngresoForm,OrdenMedicamentoForm,ChequeoBodegaForm,ChequeoBotiquinForm,OrdenMedEgresoForm
+from .forms import LoginForm,OrdenIngresoForm,OrdenMedicamentoForm,ChequeoBodegaForm,ChequeoBotiquinForm,\
+    OrdenMedEgresoForm,OrdenEgresoForm,OrdenMedTraspasoForm
 from django.forms import formset_factory, inlineformset_factory
 from django.shortcuts import render
 from .models import Medicamento,Tipo_Orden,Estacion,Orden,Orden_Medicamento
@@ -71,7 +72,7 @@ class IndexView(TemplateView):
     def get_context_data(self, **kwargs):
         conteo_med1 = conteo_medicamentos()
         conteo_med1 = [x for x in conteo_med1 if (x["cantidad_bodega"] > 0 or x["cantidad_botiquin"]>0) ]
-        conteo_med = [x for x in conteo_med1 if x["fecha_venc"] < date.today() + relativedelta(months=+23) and
+        conteo_med = [x for x in conteo_med1 if x["fecha_venc"] < date.today() + relativedelta(months=+2) and
                       (x["cantidad_bodega"] > 0 or x["cantidad_botiquin"]>0)]
 
         por_fecha = sorted(conteo_med, key=lambda med: med["fecha_venc"])
@@ -234,9 +235,12 @@ class OrdenIngresoView(TemplateView):
         form = OrdenIngresoForm(self.request.POST)
         formset = self.OrdenFormset(self.request.POST)
         if all([form.is_valid(),formset.is_valid()]):
+            desc_tipo = self.request.POST["desc_tipo"]
             nueva_orden = form.save(commit=False)
+            nueva_orden.origen = Estacion.objects.filter(estacion="Otro")[0]
             nueva_orden.user = self.request.user
             nueva_orden.salida = False
+            nueva_orden.descripcion_tipo = desc_tipo
             nueva_orden.save()
 
             for med_form in formset:
@@ -259,7 +263,7 @@ class OrdenEgresoView(TemplateView):
     OrdenFormset = formset_factory(OrdenMedEgresoForm, extra=1)
 
     def get_context_data(self, **kwargs):
-        form = OrdenIngresoForm(self.request.POST)
+        form = OrdenEgresoForm(self.request.POST)
         # OrdenFormset = inlineformset_factory(Orden, Orden_Medicamento, form=OrdenMedicamentoForm,extra=1)
 
         context = super(OrdenEgresoView, self).get_context_data(**kwargs)
@@ -268,12 +272,15 @@ class OrdenEgresoView(TemplateView):
         return context
 
     def post(self, request, *args, **kwargs):
-        form = OrdenIngresoForm(self.request.POST)
+        form = OrdenEgresoForm(self.request.POST)
         formset = self.OrdenFormset(self.request.POST)
         if all([form.is_valid(), formset.is_valid()]):
+            desc_tipo = self.request.POST["desc_tipo"]
             nueva_orden = form.save(commit=False)
+            nueva_orden.destino = Estacion.objects.filter(estacion="Otro")[0]
             nueva_orden.user = self.request.user
             nueva_orden.salida = True
+            nueva_orden.descripcion_tipo = desc_tipo
             nueva_orden.save()
 
             for med_form in formset:
@@ -292,14 +299,14 @@ class OrdenEgresoView(TemplateView):
         else:
             print("no valido")
             print(formset.errors)
-            form = OrdenIngresoForm()
+            form = OrdenEgresoForm()
 
         return HttpResponseRedirect('/orden_egreso/')
 
 class OrdenTraspasoView(TemplateView):
     template_name = "components/orden_traspaso.html"
 
-    OrdenFormset = formset_factory(OrdenMedEgresoForm, extra=1)
+    OrdenFormset = formset_factory(OrdenMedTraspasoForm, extra=1)
 
     def get_context_data(self, **kwargs):
         # OrdenFormset = inlineformset_factory(Orden, Orden_Medicamento, form=OrdenMedicamentoForm,extra=1)
@@ -312,7 +319,7 @@ class OrdenTraspasoView(TemplateView):
     def post(self, request, *args, **kwargs):
         formset = self.OrdenFormset(self.request.POST)
         if formset.is_valid():
-            orden = Orden.create(Tipo_Orden.objects.get(tipo="TRASPASO"),
+            orden = Orden.create(Tipo_Orden.objects.get(tipo="Traspaso"),
                                  Estacion.objects.get(estacion="Bodega"),
                                  Estacion.objects.get(estacion="Botiquín"),
                                  request.user, False)
@@ -333,7 +340,7 @@ class OrdenTraspasoView(TemplateView):
         else:
             print("no valido")
             print(formset.errors)
-            form = OrdenIngresoForm()
+            form = OrdenEgresoForm()
 
         return HttpResponseRedirect('/orden_traspaso/')
 
@@ -369,7 +376,7 @@ class ChequeoInventarioView(TemplateView):
                 fecha_venc = try_parsing_date(fecha_venc)
                 indice = int(request.POST["indice"])
                 conteo_actual = conteo_medicamentos()
-                orden = Orden.create(Tipo_Orden.objects.get(tipo="AJUSTE"),
+                orden = Orden.create(Tipo_Orden.objects.get(tipo="Ajuste"),
                                      Estacion.objects.get(estacion="Otro"),
                                      Estacion.objects.get(estacion="Botiquín"),
                                      request.user,False)
@@ -389,7 +396,7 @@ class ChequeoInventarioView(TemplateView):
                 print(fecha_venc)
                 indice = int(request.POST["indice"])
                 conteo_actual = conteo_medicamentos()
-                orden = Orden.create(Tipo_Orden.objects.get(tipo="AJUSTE"),
+                orden = Orden.create(Tipo_Orden.objects.get(tipo="Ajuste"),
                                      Estacion.objects.get(estacion="Otro"),
                                      Estacion.objects.get(estacion="Bodega"),
                                      request.user, False)

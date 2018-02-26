@@ -1,5 +1,5 @@
 from django import forms
-from .models import Orden,Orden_Medicamento,Tipo_Orden,Medicamento
+from .models import Orden,Orden_Medicamento,Tipo_Orden,Medicamento,Estacion
 
 
 def conteo_medicamentos():
@@ -45,14 +45,28 @@ class LoginForm(forms.Form):
     password = forms.CharField(widget=forms.PasswordInput())
 
 class OrdenIngresoForm(forms.ModelForm):
+    tipo = forms.ModelChoiceField(queryset=Tipo_Orden.objects.filter(clase=0),
+                                  widget=forms.widgets.Select(attrs={"class":"form-control",
+                                                                     "id":"tipo-orden"}))
+    destino = forms.ModelChoiceField(queryset=Estacion.objects.all().exclude(estacion="Otro"),
+                                  widget=forms.widgets.Select(attrs={"class":"form-control"}))
     class Meta:
         def __init__(self, *args, **kwargs):
             self.fields['tipo'].label = "Tipo de Orden"
         model = Orden
-        fields = ['tipo','origen','destino']
-        widgets = {"tipo":forms.Select(attrs={"class":"form-control"}),
-                   "origen": forms.Select(attrs={"class": "form-control"}),
-                   "destino":forms.Select(attrs={"class":"form-control"})}
+        fields = ['tipo','destino']
+
+class OrdenEgresoForm(forms.ModelForm):
+    tipo = forms.ModelChoiceField(queryset=Tipo_Orden.objects.filter(clase=2).order_by('tipo')
+                                  ,widget=forms.widgets.Select(attrs={"class":"form-control",
+                                                                      "id": "tipo-orden"}))
+    origen = forms.ModelChoiceField(queryset=Estacion.objects.all().exclude(estacion="Otro"),
+                                     widget=forms.widgets.Select(attrs={"class": "form-control"}))
+    class Meta:
+        def __init__(self, *args, **kwargs):
+            self.fields['tipo'].label = "Tipo de Orden"
+        model = Orden
+        fields = ['tipo','origen']
 
 class MedFecha:
     def __init__(self,generico,comercial,fecha,cantidad_bodega,cantidad_botiquin,id_med):
@@ -81,20 +95,36 @@ class OrdenMedicamentoForm(forms.ModelForm):
         widget=forms.widgets.DateInput(format="%m/%Y",attrs={"class": "form-control"}))
 
 
-def get_choices():
+def get_choices_egreso():
     a = conteo_medicamentos()
     a = [b for b in a if b["cantidad_bodega"]>0 or b["cantidad_botiquin"]>0]
     obj = [MedFecha(c["generico"],c["comercial"],c["fecha_venc"],c["cantidad_bodega"],c["cantidad_botiquin"],c["id_med"]) for c in a]
     obj = sorted(obj,key=lambda x: (x.id_med,x.fecha))
     return [(o,str(o)) for o in obj]
+
+def get_choices_traspaso():
+    a = conteo_medicamentos()
+    a = [b for b in a if b["cantidad_bodega"]>0]
+    obj = [MedFecha(c["generico"],c["comercial"],c["fecha_venc"],c["cantidad_bodega"],c["cantidad_botiquin"],c["id_med"]) for c in a]
+    obj = sorted(obj,key=lambda x: (x.id_med,x.fecha))
+    return [(o,str(o)) for o in obj]
 class OrdenMedEgresoForm(forms.Form):
 
-    medicamento = forms.ChoiceField(choices=get_choices(),widget=forms.widgets.Select(attrs={"class": "form-control selectpicker",
+    medicamento = forms.ChoiceField(choices=get_choices_egreso(),widget=forms.widgets.Select(attrs={"class": "form-control selectpicker",
                                                                                    "data-live-search": "true"}))
     cantidad = forms.IntegerField(widget=forms.widgets.NumberInput(attrs={"class": "form-control"}))
     def __init__(self, *args, **kwargs):
         super(OrdenMedEgresoForm, self).__init__(*args, **kwargs)
-        self.fields["medicamento"].choices = get_choices()
+        self.fields["medicamento"].choices = get_choices_egreso()
+
+class OrdenMedTraspasoForm(forms.Form):
+
+    medicamento = forms.ChoiceField(choices=get_choices_traspaso(),widget=forms.widgets.Select(attrs={"class": "form-control selectpicker",
+                                                                                   "data-live-search": "true"}))
+    cantidad = forms.IntegerField(widget=forms.widgets.NumberInput(attrs={"class": "form-control"}))
+    def __init__(self, *args, **kwargs):
+        super(OrdenMedTraspasoForm, self).__init__(*args, **kwargs)
+        self.fields["medicamento"].choices = get_choices_traspaso()
 
 
 class ChequeoBodegaForm(forms.Form):

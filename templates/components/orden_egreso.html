@@ -45,13 +45,13 @@
                           <label>Tipo de Orden</label>
                           {{ form2.tipo }}
                         </div>
+                        <div class="col-md-3 mb-3" id="descripcion-tipo" style="display:none;">
+                          <label>Descripción</label>
+                          <input type="text" class="form-control" value="" name="desc_tipo">
+                        </div>
                         <div class="col-md-3 mb-3">
                           <label>Origen</label>
                           {{ form2.origen }}
-                        </div>
-                        <div class="col-md-3 mb-3">
-                          <label>Destino</label>
-                          {{ form2.destino }}
                         </div>
                       </div>
 
@@ -114,6 +114,15 @@
             $(this).selectpicker()
             });
     }
+    $("#tipo-orden").change(function(){
+        var value = $("#tipo-orden option:selected").text();
+        console.log(value);
+        if (value == "Otro"){
+            $("#descripcion-tipo").show();
+        }else {
+            $("#descripcion-tipo").hide();
+        }
+    });
 
 
 

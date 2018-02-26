@@ -31,6 +31,7 @@ class Tipo_Egreso(models.Model):
 
 class Estacion(models.Model):
     estacion = models.CharField(max_length=100)
+    clase = models.IntegerField() #0 ingreso, 1 traspaso, 2 egreso
     def __str__(self):
         return self.estacion
 
