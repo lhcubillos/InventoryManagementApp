@@ -83,6 +83,7 @@ class OrdenMedicamentoForm(forms.ModelForm):
 
 def get_choices():
     a = conteo_medicamentos()
+    a = [b for b in a if b["cantidad_bodega"]>0 or b["cantidad_botiquin"]>0]
     obj = [MedFecha(c["generico"],c["comercial"],c["fecha_venc"],c["cantidad_bodega"],c["cantidad_botiquin"],c["id_med"]) for c in a]
     obj = sorted(obj,key=lambda x: (x.id_med,x.fecha))
     return [(o,str(o)) for o in obj]

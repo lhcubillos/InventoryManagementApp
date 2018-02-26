@@ -9,7 +9,8 @@ from django.forms import formset_factory, inlineformset_factory
 from django.shortcuts import render
 from .models import Medicamento,Tipo_Orden,Estacion,Orden,Orden_Medicamento
 
-from datetime import datetime
+from datetime import datetime,date
+from dateutil.relativedelta import relativedelta
 from dateutil.parser import parse
 import locale
 locale.setlocale(locale.LC_TIME, '')
@@ -69,8 +70,15 @@ class IndexView(TemplateView):
 
     def get_context_data(self, **kwargs):
         conteo_med1 = conteo_medicamentos()
-        conteo_med = [x for x in conteo_med1 if x["fecha_venc"] < datetime.date(datetime.now())]
+        conteo_med1 = [x for x in conteo_med1 if (x["cantidad_bodega"] > 0 or x["cantidad_botiquin"]>0) ]
+        conteo_med = [x for x in conteo_med1 if x["fecha_venc"] < date.today() + relativedelta(months=+23) and
+                      (x["cantidad_bodega"] > 0 or x["cantidad_botiquin"]>0)]
+
         por_fecha = sorted(conteo_med, key=lambda med: med["fecha_venc"])
+
+        #(vencido,venciendose,remedio)
+        por_fecha = [(True if x["fecha_venc"] < date.today() - relativedelta(months=+1)else False,
+                      True if x["fecha_venc"] < date.today() else False,x) for x in por_fecha]
         context = super(IndexView, self).get_context_data(**kwargs)
         context.update({'title': "Panel","conteo":por_fecha,"total":conteo_med1})
         return context

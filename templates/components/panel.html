@@ -40,8 +40,9 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for med in conteo %}
-                                <tr class="item">
+
+                            {% for venc,venciendo,med in conteo %}
+                                <tr class="{% if venc %}danger{% elif venciendo %}warning{% else %}item{% endif %}">
                                     <td id="gen">{{ med.generico }}</td>
                                     <td id="com">{{ med.comercial }}</td>
                                     <td id="fecha">{{ med.fecha_venc }}</td>
@@ -80,7 +81,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for med in   total %}
+                            {% for med in total %}
                                 <tr class="item">
                                     <td>{{ med.generico }}</td>
                                     <td>{{ med.comercial }}</td>
