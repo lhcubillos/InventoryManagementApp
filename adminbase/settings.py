@@ -81,6 +81,8 @@ LANGUAGE_CODE = 'es'
 
 TIME_ZONE = 'America/Santiago'
 
+DATE_FORMAT = 'm/Y'
+
 USE_I18N = True
 
 USE_L10N = False

@@ -84,8 +84,8 @@ class Orden(models.Model):
                ", destino="+str(self.destino)+", user="+str(self.user)+", salida="+str(self.salida)
 
     @classmethod
-    def create(cls, tipo,origen,destino,user):
-        orden = cls(tipo=tipo,origen=origen,destino=destino,user=user)
+    def create(cls, tipo,origen,destino,user,salida):
+        orden = cls(tipo=tipo,origen=origen,destino=destino,user=user,salida=salida)
         # do something with the book
         return orden
 

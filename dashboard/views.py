@@ -4,12 +4,26 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 
-from .forms import LoginForm,OrdenIngresoForm,OrdenMedicamentoForm,ChequeoInventarioForm
+from .forms import LoginForm,OrdenIngresoForm,OrdenMedicamentoForm,ChequeoBodegaForm,ChequeoBotiquinForm,OrdenMedEgresoForm
 from django.forms import formset_factory, inlineformset_factory
 from django.shortcuts import render
 from .models import Medicamento,Tipo_Orden,Estacion,Orden,Orden_Medicamento
 
 from datetime import datetime
+from dateutil.parser import parse
+import locale
+locale.setlocale(locale.LC_TIME, '')
+
+
+def try_parsing_date(text):
+    locale.setlocale(locale.LC_TIME, 'es_ES.UTF-8')
+    for fmt in ("%b. %d, %Y", "%b %d, %Y","%B %d, %Y","%m/%Y"):
+        try:
+            print(fmt)
+            return datetime.strptime(text, fmt).date()
+        except ValueError:
+            pass
+    raise ValueError('no valid date format found')
 
 def conteo_medicamentos():
     a_contar = []
@@ -40,6 +54,7 @@ def conteo_medicamentos():
     for key, value in conteo_medicamentos.items():
         dic = {}
         med = Medicamento.objects.get(id=key[0])
+        dic["id_med"] = key[0]
         dic["generico"] = med.nombre_generico
         dic["comercial"] = med.nombre_comercial
         dic["cantidad_bodega"] = value[0]
@@ -123,6 +138,8 @@ class LoginView(TemplateView):
         form = LoginForm(self.request.POST)
         context = super(LoginView, self).get_context_data(**kwargs)
         context.update({'title': "Log In","form":form,"fallido":False})
+        # if self.request.user != None:
+        #     return HttpResponseRedirect('/panel/')
         return context
 
     def post(self, request, *args, **kwargs):
@@ -231,7 +248,7 @@ class OrdenIngresoView(TemplateView):
 class OrdenEgresoView(TemplateView):
     template_name = "components/orden_egreso.html"
 
-    OrdenFormset = formset_factory(OrdenMedicamentoForm, extra=1)
+    OrdenFormset = formset_factory(OrdenMedEgresoForm, extra=1)
 
     def get_context_data(self, **kwargs):
         form = OrdenIngresoForm(self.request.POST)
@@ -252,10 +269,16 @@ class OrdenEgresoView(TemplateView):
             nueva_orden.save()
 
             for med_form in formset:
-                nueva_med_orden = med_form.save(commit=False)
-                nueva_med_orden.orden = nueva_orden
-                nueva_med_orden.save()
+                data = med_form.cleaned_data
+                med = data.get("medicamento")
+                id = int(med.split("|")[0])
+                print(med.split("|")[3][-8:].strip())
+                fecha = try_parsing_date(med.split("|")[3][-8:].strip()  )
 
+                cantidad = data.get("cantidad")
+                orden_med = Orden_Medicamento(orden=nueva_orden, medicamento=Medicamento.objects.get(id=id),
+                                              fecha_vencimiento=fecha, cantidad=cantidad)
+                orden_med.save()
             return HttpResponseRedirect('/panel/')
 
         else:
@@ -264,6 +287,47 @@ class OrdenEgresoView(TemplateView):
             form = OrdenIngresoForm()
 
         return HttpResponseRedirect('/orden_egreso/')
+
+class OrdenTraspasoView(TemplateView):
+    template_name = "components/orden_traspaso.html"
+
+    OrdenFormset = formset_factory(OrdenMedEgresoForm, extra=1)
+
+    def get_context_data(self, **kwargs):
+        # OrdenFormset = inlineformset_factory(Orden, Orden_Medicamento, form=OrdenMedicamentoForm,extra=1)
+
+        context = super(OrdenTraspasoView, self).get_context_data(**kwargs)
+        formset = self.OrdenFormset()
+        context.update({'title': "Orden Traspaso", "formset": formset})
+        return context
+
+    def post(self, request, *args, **kwargs):
+        formset = self.OrdenFormset(self.request.POST)
+        if formset.is_valid():
+            orden = Orden.create(Tipo_Orden.objects.get(tipo="TRASPASO"),
+                                 Estacion.objects.get(estacion="Bodega"),
+                                 Estacion.objects.get(estacion="Botiquín"),
+                                 request.user, False)
+            orden.save()
+            for med_form in formset:
+                data = med_form.cleaned_data
+                med = data.get("medicamento")
+                id = int(med.split("|")[0])
+                print(med.split("|")[3][-8:].strip())
+                fecha = try_parsing_date(med.split("|")[3][-8:].strip()  )
+
+                cantidad = data.get("cantidad")
+                orden_med = Orden_Medicamento(orden=orden, medicamento=Medicamento.objects.get(id=id),
+                                              fecha_vencimiento=fecha, cantidad=cantidad)
+                orden_med.save()
+            return HttpResponseRedirect('/panel/')
+
+        else:
+            print("no valido")
+            print(formset.errors)
+            form = OrdenIngresoForm()
+
+        return HttpResponseRedirect('/orden_traspaso/')
 
 class EstadisticasView(TemplateView):
     template_name = "components/estadisticas.html"
@@ -276,10 +340,56 @@ class EstadisticasView(TemplateView):
 class ChequeoInventarioView(TemplateView):
     template_name = "components/chequeo_inventario.html"
 
+
     def get_context_data(self, **kwargs):
-        form = ChequeoInventarioForm()
         conteo_final = conteo_medicamentos()
+        form_bodega = ChequeoBodegaForm()
+        form_botiquin = ChequeoBotiquinForm()
         context = super(ChequeoInventarioView, self).get_context_data(**kwargs)
-        context.update({'title': "Chequeo Inventario","conteo":conteo_final,"form":form})
+        context.update({'title': "Chequeo Inventario","conteo":conteo_final,"form_bodega":form_bodega,
+                        "form_botiquin":form_botiquin})
         return context
 
+    def post(self, request, *args, **kwargs):
+        if "act_botiquin" in request.POST:
+            form_botiquin = ChequeoBotiquinForm(request.POST)
+            if form_botiquin.is_valid():
+                conteo_real = int(request.POST["conteo_real_botiquin"])
+                id_med = request.POST["id_med"]
+                fecha_venc = request.POST["fecha_venc"]
+                f = "%b. %d, %Y"
+                fecha_venc = try_parsing_date(fecha_venc)
+                indice = int(request.POST["indice"])
+                conteo_actual = conteo_medicamentos()
+                orden = Orden.create(Tipo_Orden.objects.get(tipo="AJUSTE"),
+                                     Estacion.objects.get(estacion="Otro"),
+                                     Estacion.objects.get(estacion="Botiquín"),
+                                     request.user,False)
+                orden.save()
+                conteo_final = conteo_medicamentos()
+                ajuste = conteo_real - conteo_final[indice]["cantidad_botiquin"]
+                orden_med = Orden_Medicamento(orden=orden,medicamento=Medicamento.objects.get(id=id_med),
+                                              fecha_vencimiento=fecha_venc,cantidad=ajuste)
+                orden_med.save()
+        elif "act_bodega" in request.POST:
+            form_bodega = ChequeoBodegaForm(request.POST)
+            if form_bodega.is_valid():
+                conteo_real = int(request.POST["conteo_real_bodega"])
+                id_med = request.POST["id_med"]
+                fecha_venc = request.POST["fecha_venc"]
+                fecha_venc = try_parsing_date(fecha_venc)
+                print(fecha_venc)
+                indice = int(request.POST["indice"])
+                conteo_actual = conteo_medicamentos()
+                orden = Orden.create(Tipo_Orden.objects.get(tipo="AJUSTE"),
+                                     Estacion.objects.get(estacion="Otro"),
+                                     Estacion.objects.get(estacion="Bodega"),
+                                     request.user, False)
+                orden.save()
+                conteo_final = conteo_medicamentos()
+                ajuste = conteo_real - conteo_final[indice]["cantidad_bodega"]
+                orden_med = Orden_Medicamento(orden=orden, medicamento=Medicamento.objects.get(id=id_med),
+                                              fecha_vencimiento=fecha_venc, cantidad=ajuste)
+                orden_med.save()
+
+        return HttpResponseRedirect('/chequeo_inventario/')

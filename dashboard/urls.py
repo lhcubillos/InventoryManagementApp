@@ -9,6 +9,7 @@ urlpatterns = [
     url(r'^estadisticas/$', login_required(views.EstadisticasView.as_view(),login_url="/"), name="estadisticas"),
     url(r'^orden_ingreso/$', login_required(views.OrdenIngresoView.as_view(),login_url="/"), name="orden_ingreso"),
     url(r'^orden_egreso/$', login_required(views.OrdenEgresoView.as_view(),login_url="/"), name="orden_egreso"),
+    url(r'^orden_traspaso/$', login_required(views.OrdenTraspasoView.as_view(),login_url="/"), name="orden_traspaso"),
     url(r'^chequeo_inventario/$', login_required(views.ChequeoInventarioView.as_view(),login_url="/"),
         name="chequeo_inventario"),
     url(r'^blank/$', login_required(views.BlankView.as_view(),login_url="/"), name="blank"),

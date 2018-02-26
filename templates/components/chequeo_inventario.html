@@ -8,12 +8,21 @@
          var fecha_venc = $(this).children('td#fecha').text();
          var bodega = $(this).children('td#bod').text();
          var botiquin = $(this).children('td#bot').text();
+         var id_med = $(this).children('td#id_med').text();
+         var indice = $(this).children('td#indice').text();
 
          $(".modal-body #nombre_generico").text( nom_gen );
          $(".modal-body #nombre_comercial").text( nom_com );
          $(".modal-body #fecha_vencimiento").text( fecha_venc );
          $(".modal-body #bodega_actual").text( bodega );
          $(".modal-body #botiquin_actual").text( botiquin );
+         $(".modal-body #id_med1").val( id_med );
+         $(".modal-body #id_med2").val( id_med );
+         $(".modal-body #fecha_venc1").val( fecha_venc );
+         $(".modal-body #fecha_venc2").val( fecha_venc );
+         $(".modal-body #indice1").val( indice );
+         $(".modal-body #indice2").val( indice );
+
     });
 </script>
 
@@ -67,7 +76,9 @@
                         </thead>
                         <tbody>
                             {% for med in conteo %}
-                                <tr class="item chequeo-inventario" data-toggle="modal" data-id="{{ forloop.counter0 }}" data-target="#modalChequeo">
+                                <tr class="item chequeo-inventario" style="cursor: pointer;" data-toggle="modal" data-id="{{ forloop.counter0 }}" data-target="#modalChequeo">
+                                    <td id="indice" style="display:none;">{{ forloop.counter0 }}</td>
+                                    <td id="id_med" style="display:none;">{{ med.id_med }}</td>
                                     <td id="gen">{{ med.generico }}</td>
                                     <td id="com">{{ med.comercial }}</td>
                                     <td id="fecha">{{ med.fecha_venc }}</td>
@@ -128,30 +139,34 @@
 
 
                             <form role="form" method="POST" id="act_bodega">
+                                {% csrf_token %}
 
                               <div class="form-group">
                                 <label>Conteo real en bodega:</label>
-                                  {{ form.conteo_real_bodega }}
+                                  {{ form_bodega.conteo_real_bodega }}
 
 
                               </div>
+                              <input type="hidden" id="id_med1" name="id_med" value="">
+                              <input type="hidden" id="fecha_venc1" name="fecha_venc" value="">
+                              <input type="hidden" id="indice1" name="indice" value="">
 
-
-                              <button type="submit" class="btn btn-default btn-block">Actualizar Bodega</button>
+                              <button type="submit" class="btn btn-default btn-block" name="act_bodega">Actualizar Bodega</button>
                             </form>
 
                             <form role="form" method="POST" id="act_botiquin" style="display: none;">
-
+                                {% csrf_token %}
 
                               <div class="form-group">
                                 <label>Conteo real en botiquín:</label>
-                                  {{ form.conteo_real_botiquin }}
+                                  {{ form_botiquin.conteo_real_botiquin }}
                                 </div>
+                              <input type="hidden" id="id_med2" name="id_med" value="">
+                              <input type="hidden" id="fecha_venc2" name="fecha_venc" value="">
+                              <input type="hidden" id="indice2" name="indice" value="">
 
 
-
-
-                              <button type="submit" class="btn btn-default btn-block">Actualizar Botiquín</button>
+                              <button type="submit" class="btn btn-default btn-block" name="act_botiquin">Actualizar Botiquín</button>
                             </form>
 
 

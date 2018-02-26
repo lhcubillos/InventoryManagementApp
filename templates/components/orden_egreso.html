@@ -15,6 +15,10 @@
                 format: 'DD/MM/YYYY'
         });
     });
+
+    $(function() {
+      $('.selectpicker2').selectpicker();
+    });
 </script>
 {% endblock extrahead %}
 
@@ -52,36 +56,29 @@
                       </div>
 
                       <br>
-                        <h4>Medicamentos en orden</h4>
+                        <h4>Medicamentos Disponibles</h4>
                         {{ formset.management_form }}
                         <ul class="list-group borderless">
                           {% for form in formset.forms %}
                             <li class="list-group-item formset"  >
-                                <div class="col-md-6 mb-3">
+                                <div class="row">
+                                  <div class="col-md-9 mb-3">
                                   <label>Medicamento (nombre genérico | comercial)</label>
-                                  {{ form.medicamento }}
+                                  {{ form.medicamento }}
                                 </div>
-                                <div class="col-md-3 mb-3">
-                                  <label>Fecha Vencimiento</label>
 
-                                  <div class='input-group date datetimepicker1'>
-                                        {{ form.fecha_vencimiento }}
-                                        <span class="input-group-addon">
-                                            <span class="glyphicon glyphicon-calendar">
-                                            </span>
-                                        </span>
-                                    </div>
-
-                                </div>
                                 <div class="col-md-3 mb-3">
                                   <label>Cantidad (según formato)</label>
                                     {{ form.cantidad }}
                                 </div>
+
+                                </div>
+
                             </li>
                           {% endfor %}
                         </ul>
 
-                      <input class="btn btn-primary" type="submit" value="Submit" />
+                      <input class="btn btn-primary" type="submit" value="Crear Orden" />
                     </form>
 
                 </div>
@@ -103,17 +100,21 @@
     $('.formset').formset({
         addText: 'Agregar Medicamento',
         deleteText: 'Quitar Medicamento',
-        added: renewDatePickers
+        added: renewAll
     });
 
-    function renewDatePickers() {
+    function renewAll() {
         $('.datetimepicker1').each(function(){
             $(this).datetimepicker({
                 viewMode: 'years',
-                format: 'DD/MM/YYYY'
+                format: 'MM/YYYY'
             });
            });
+        $('.selectpicker').each(function(){
+            $(this).selectpicker()
+            });
     }
+
 
 
 </script>
