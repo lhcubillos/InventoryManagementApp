@@ -18,7 +18,7 @@ locale.setlocale(locale.LC_TIME, '')
 
 
 def try_parsing_date(text):
-    locale.setlocale(locale.LC_TIME, 'es_ES.UTF-8')
+    # locale.setlocale(locale.LC_TIME, 'es_ES.UTF-8')
     for fmt in ("%b. %d, %Y", "%b %d, %Y","%B %d, %Y","%m/%Y"):
         try:
             print(fmt)
@@ -143,12 +143,19 @@ class IconsView(TemplateView):
 class LoginView(TemplateView):
     template_name = "components/login.html"
 
+    def get(self, request, *args, **kwargs):
+        if self.request.user.is_authenticated():
+            return HttpResponseRedirect('/panel/')
+        return super().get(request, *args, **kwargs)
     def get_context_data(self, **kwargs):
+        # print(self.request.user.is_authenticated())
+
         form = LoginForm(self.request.POST)
         context = super(LoginView, self).get_context_data(**kwargs)
         context.update({'title': "Log In","form":form,"fallido":False})
         # if self.request.user != None:
         #     return HttpResponseRedirect('/panel/')
+
         return context
 
     def post(self, request, *args, **kwargs):

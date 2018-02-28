@@ -79,17 +79,14 @@
             <!-- /.dropdown -->
             <li class="dropdown">
                 <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                    <i class="fa fa-user fa-fw"></i>  <i class="fa fa-caret-down"></i>
+                   {{user.first_name}} {{user.last_name }} <i class="fa fa-user fa-fw"></i>  <i class="fa fa-caret-down"></i>
                 </a>
                 <ul class="dropdown-menu dropdown-user">
                     {% if user.is_authenticated %}
-                        <li><a href="#"><i class="fa fa-user fa-fw"></i> {{user.username}}</a>
-                        </li>
-                        <li class="divider"></li>
-                        <li><a href="{% url 'dashboard:logout' %}"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
+                        <li><a href="{% url 'dashboard:logout' %}"><i class="fa fa-sign-out fa-fw"></i> Salir</a>
                         </li>
                     {% else %}
-                        <li><a href="{% url 'dashboard:login' %}"><i class="fa fa-sign-in fa-fw"></i> Login</a>
+                        <li><a href="{% url 'dashboard:login' %}"><i class="fa fa-sign-in fa-fw"></i> Ingresar</a>
                         </li>
 
                     {% endif %}
