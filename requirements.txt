@@ -13,6 +13,7 @@ Jinja2==2.9.6
 jsonschema==2.6.0
 prompt-toolkit==1.0.15
 python-dateutil==2.6.1
+psycopg2==2.7.4
 smart-open==1.5.3
 statsmodels==0.8.0
 terminado==0.6
