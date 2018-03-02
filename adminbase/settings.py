@@ -1,5 +1,6 @@
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+import dj_database_url
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -66,13 +67,20 @@ WSGI_APPLICATION = 'adminbase.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': 'lhcubillos',
+# 	'USER': 'lhcubillos',
+# 	'PASSWORD': '26noviembre',
+# 	'HOST':'localhost',
+# 	'PORT':'',
+#     }
+# }
 
+DATABASES = {}
+print(dj_database_url.config(conn_max_age=600))
+DATABASES['default'] = dj_database_url.config(conn_max_age=600)
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/

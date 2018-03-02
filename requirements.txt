@@ -1,4 +1,5 @@
 Django==1.10
+dj-database-url==0.4.2
 django-bootstrap3==9.1.0
 django-jet==1.0.6
 django-sb-admin==0.3.6
