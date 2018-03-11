@@ -79,8 +79,7 @@ WSGI_APPLICATION = 'adminbase.wsgi.application'
 # }
 
 DATABASES = {}
-print(dj_database_url.config(conn_max_age=600))
-DATABASES['default'] = dj_database_url.config(conn_max_age=600)
+DATABASES['default'] = dj_database_url.config(default="postgres://zfzfltlapkbthu:ae55446faea9f5c58ecd7426e40cbfc9c388d651ff1f8d498095be2f904e0d8e@ec2-107-22-165-47.compute-1.amazonaws.com:5432/d67ot7im3fii6g",conn_max_age=600)
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/

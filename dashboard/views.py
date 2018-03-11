@@ -42,12 +42,12 @@ def conteo_medicamentos():
         for med, cant, fecha in meds:
             if (med.id, fecha) not in conteo_medicamentos.keys():
                 conteo_medicamentos[(med.id, fecha)] = [0, 0]
-            if orden.origen.estacion == "Botiquín":
+            if orden.origen.estacion == "Botiquin":
                 conteo_medicamentos[(med.id, fecha)][1] -= cant
             elif orden.origen.estacion == "Bodega":
                 conteo_medicamentos[(med.id, fecha)][0] -= cant
 
-            if orden.destino.estacion == "Botiquín":
+            if orden.destino.estacion == "Botiquin":
                 conteo_medicamentos[(med.id, fecha)][1] += cant
             elif orden.destino.estacion == "Bodega":
                 conteo_medicamentos[(med.id, fecha)][0] += cant
@@ -328,7 +328,7 @@ class OrdenTraspasoView(TemplateView):
         if formset.is_valid():
             orden = Orden.create(Tipo_Orden.objects.get(tipo="Traspaso"),
                                  Estacion.objects.get(estacion="Bodega"),
-                                 Estacion.objects.get(estacion="Botiquín"),
+                                 Estacion.objects.get(estacion="Botiquin"),
                                  request.user, False)
             orden.save()
             for med_form in formset:
@@ -385,7 +385,7 @@ class ChequeoInventarioView(TemplateView):
                 conteo_actual = conteo_medicamentos()
                 orden = Orden.create(Tipo_Orden.objects.get(tipo="Ajuste"),
                                      Estacion.objects.get(estacion="Otro"),
-                                     Estacion.objects.get(estacion="Botiquín"),
+                                     Estacion.objects.get(estacion="Botiquin"),
                                      request.user,False)
                 orden.save()
                 conteo_final = conteo_medicamentos()

@@ -17,12 +17,12 @@ def conteo_medicamentos():
         for med, cant, fecha in meds:
             if (med.id, fecha) not in conteo_medicamentos.keys():
                 conteo_medicamentos[(med.id, fecha)] = [0, 0]
-            if orden.origen.estacion == "Botiquín":
+            if orden.origen.estacion == "Botiquin":
                 conteo_medicamentos[(med.id, fecha)][1] -= cant
             elif orden.origen.estacion == "Bodega":
                 conteo_medicamentos[(med.id, fecha)][0] -= cant
 
-            if orden.destino.estacion == "Botiquín":
+            if orden.destino.estacion == "Botiquin":
                 conteo_medicamentos[(med.id, fecha)][1] += cant
             elif orden.destino.estacion == "Bodega":
                 conteo_medicamentos[(med.id, fecha)][0] += cant
