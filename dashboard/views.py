@@ -368,10 +368,14 @@ class ChequeoInventarioView(TemplateView):
 
     def get_context_data(self, **kwargs):
         conteo_final = conteo_medicamentos()
+
+        conteo_med1 = [x for x in conteo_final if (x["cantidad_bodega"] > 0 or x["cantidad_botiquin"] > 0)]
+
+        por_generico = sorted(conteo_med1, key=lambda med: med["nombre_generico"])
         form_bodega = ChequeoBodegaForm()
         form_botiquin = ChequeoBotiquinForm()
         context = super(ChequeoInventarioView, self).get_context_data(**kwargs)
-        context.update({'title': "Chequeo Inventario","conteo":conteo_final,"form_bodega":form_bodega,
+        context.update({'title': "Chequeo Inventario","conteo":por_generico,"form_bodega":form_bodega,
                         "form_botiquin":form_botiquin})
         return context
 

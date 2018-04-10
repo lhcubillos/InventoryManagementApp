@@ -71,8 +71,11 @@
                                 <th class="text-center">Nombre Genérico</th>
                                 <th class="text-center">Nombre Comercial</th>
                                 <th class="text-center">Fecha Vencimiento</th>
-                                <th class="text-center">Cantidad bodega</th>
-                                <th class="text-center">Cantidad botiquín</th>
+                                <th class="text-center">Dosis</th>
+                                <th class="text-center">Formato Medicamento</th>
+                                <th class="text-center">Tipo Medicamento</th>
+                                <th class="text-center">Cantidad en bodega</th>
+                                <th class="text-center">Cantidad en botiquín</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -83,6 +86,9 @@
                                     <td id="gen">{{ med.generico }}</td>
                                     <td id="com">{{ med.comercial }}</td>
                                     <td id="fecha">{{ med.fecha_venc }}</td>
+                                    <td id="dosis">{{ med.dosis }}</td>
+                                    <td id="formato">{{ med.formato }}</td>
+                                    <td id="tipo">{{ med.tipo }}</td>
                                     <td id="bod">{{ med.cantidad_bodega }}</td>
                                     <td id="bot">{{ med.cantidad_botiquin }}</td>
                                 </tr>
