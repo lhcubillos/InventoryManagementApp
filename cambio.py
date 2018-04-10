@@ -9,4 +9,4 @@ for line in f:
         f2.write(",".join(l))
     else:
         l[1] = 'true'
-        f2.write(",".join(l))
+        f2.write(",".join())

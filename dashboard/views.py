@@ -59,6 +59,9 @@ def conteo_medicamentos():
         dic["id_med"] = key[0]
         dic["generico"] = med.nombre_generico
         dic["comercial"] = med.nombre_comercial
+        dic["formato"] = med.formato_medicamento
+        dic["tipo"] = med.tipo_medicamento
+        dic["dosis"] = med.dosis
         dic["cantidad_bodega"] = value[0]
         dic["cantidad_botiquin"] = value[1]
         dic["fecha_venc"] = key[1]
