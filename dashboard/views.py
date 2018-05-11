@@ -389,13 +389,15 @@ class ChequeoInventarioView(TemplateView):
                 f = "%b. %d, %Y"
                 fecha_venc = try_parsing_date(fecha_venc)
                 indice = int(request.POST["indice"])
-                conteo_actual = conteo_medicamentos()
+                # conteo_actual = conteo_medicamentos()
                 orden = Orden.create(Tipo_Orden.objects.get(tipo="Ajuste"),
                                      Estacion.objects.get(estacion="Otro"),
                                      Estacion.objects.get(estacion="Botiquin"),
                                      request.user,False)
                 orden.save()
                 conteo_final = conteo_medicamentos()
+                conteo_final = [x for x in conteo_final if (x["cantidad_bodega"] > 0 or x["cantidad_botiquin"] > 0)]
+                conteo_final.sort(key=lambda med: med["generico"])
                 ajuste = conteo_real - conteo_final[indice]["cantidad_botiquin"]
                 orden_med = Orden_Medicamento(orden=orden,medicamento=Medicamento.objects.get(id=id_med),
                                               fecha_vencimiento=fecha_venc,cantidad=ajuste)
@@ -409,13 +411,15 @@ class ChequeoInventarioView(TemplateView):
                 fecha_venc = try_parsing_date(fecha_venc)
                 print(fecha_venc)
                 indice = int(request.POST["indice"])
-                conteo_actual = conteo_medicamentos()
+                # conteo_actual = conteo_medicamentos()
                 orden = Orden.create(Tipo_Orden.objects.get(tipo="Ajuste"),
                                      Estacion.objects.get(estacion="Otro"),
                                      Estacion.objects.get(estacion="Bodega"),
                                      request.user, False)
                 orden.save()
                 conteo_final = conteo_medicamentos()
+                conteo_final = [x for x in conteo_final if (x["cantidad_bodega"] > 0 or x["cantidad_botiquin"] > 0)]
+                conteo_final.sort(key=lambda med: med["generico"])
                 ajuste = conteo_real - conteo_final[indice]["cantidad_bodega"]
                 orden_med = Orden_Medicamento(orden=orden, medicamento=Medicamento.objects.get(id=id_med),
                                               fecha_vencimiento=fecha_venc, cantidad=ajuste)

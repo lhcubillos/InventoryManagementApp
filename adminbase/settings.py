@@ -70,7 +70,7 @@ WSGI_APPLICATION = 'adminbase.wsgi.application'
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#         'NAME': 'lhcubillos',
+#         'NAME': 'test_development',
 # 	'USER': 'lhcubillos',
 # 	'PASSWORD': '26noviembre',
 # 	'HOST':'localhost',
