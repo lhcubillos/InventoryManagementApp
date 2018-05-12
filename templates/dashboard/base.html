@@ -111,7 +111,7 @@
                         <!--</div>-->
                         <!--&lt;!&ndash; /input-group &ndash;&gt;-->
                     <!--</li>                   -->
-                        
+
                     <li>
                         <a href="{% url 'dashboard:panel' %}">
                             <i class="fa fa-dashboard fa-fw"></i> Panel Principal</a>
@@ -150,6 +150,10 @@
                             </li>
                         {% endif %}
                     {% endfor %}
+                    <li><a href="{% url 'dashboard:crear_medicamento' %}">
+                        <i class="fa fa-plus-square"></i> Crear Nuevo Medicamento
+                      </a>
+                    </li>
 
                 </ul>
             </div>
@@ -161,11 +165,10 @@
     <!-- Page Content -->
     <div id="page-wrapper">
         {% block content %}
-        
+
         {% endblock content %}
     </div>
     <!-- /#page-wrapper -->
 </div>
 <!-- /#wrapper -->
 {% endblock basecontent %}
-
