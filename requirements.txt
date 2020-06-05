@@ -1,4 +1,4 @@
-Django==1.10
+Django==1.11.29
 dj-database-url==0.4.2
 django-bootstrap3==9.1.0
 django-jet==1.0.6
